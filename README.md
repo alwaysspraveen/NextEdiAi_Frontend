@@ -1,4 +1,11 @@
 # CampusFlow
+<img width="2558" height="1241" alt="image" src="https://github.com/user-attachments/assets/61b072ca-fe1a-4cd0-902d-2d9fac5ad3c6" />
+<img width="2560" height="1238" alt="image" src="https://github.com/user-attachments/assets/88835d7d-0a20-4d9d-b58f-75f74253c059" />
+<img width="2560" height="1243" alt="image" src="https://github.com/user-attachments/assets/4659e61a-be88-4403-b2d0-14d01307ec6e" />
+<img width="2560" height="1235" alt="image" src="https://github.com/user-attachments/assets/1d337e23-7666-4b90-9408-aed2783214ce" />
+
+
+
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.0.
 
