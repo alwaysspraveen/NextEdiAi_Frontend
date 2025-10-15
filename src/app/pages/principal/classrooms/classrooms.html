@@ -1,0 +1,266 @@
+<p-toast></p-toast>
+
+<div class="flex flex-col h-[calc(100vh-6rem)]">
+  <p-table
+    #dt2
+    [value]="classes"
+    [scrollable]="true"
+    scrollHeight="flex"
+    dataKey="_id"
+    [rows]="10"
+    [paginator]="true"
+    class="flex-1 text-sm"
+    [tableStyle]="{ 'min-width': '65rem' }"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [globalFilterFields]="['name', 'section', 'subjectList']"
+  >
+    <!-- Caption / Global Search -->
+    <ng-template pTemplate="caption">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <p class="text-xl font-semibold text-gray-800">Manage Classes</p>
+          <p-select
+            [appendTo]="'body'"
+            [filter]="true"
+            [(ngModel)]="selectedClass"
+            name=""
+            [options]="classNames"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select Class"
+            [showClear]="true"
+            class="w-56"
+            (onChange)="onClassChange($event)"
+          >
+          </p-select>
+        </div>
+        <div class="flex items-center gap-3">
+          <p-button
+            label="Add New Class"
+            icon="pi pi-plus"
+            (onClick)="showAddDialog()"
+          />
+          <p-iconfield iconPosition="left" class="ml-auto">
+            <p-inputicon>
+              <i class="pi pi-search"></i>
+            </p-inputicon>
+            <input
+              pInputText
+              type="text"
+              placeholder="Search by class, section or teacher"
+              (input)="dt2.filterGlobal($event.target.value, 'contains')"
+            />
+          </p-iconfield>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Class Name</th>
+        <th>Section</th>
+        <th>Academic Year</th>
+        <th>Total Students</th>
+        <th>Subjects</th>
+        <th>Class Teacher</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+
+    <!-- Body -->
+    <ng-template pTemplate="body" let-class>
+      <tr>
+        <td>{{ class.name }}</td>
+        <td>{{ class.section }}</td>
+        <td>{{ class.academicYear }}</td>
+        <td>
+          {{ class.capacity }}
+        </td>
+        <td>
+          <a
+            href="#"
+            class="text-blue-500 font-medium hover:underline"
+            (click)="
+              selectedSubject = class.subjects;
+              op.show($event);
+              $event.preventDefault()
+            "
+            >View Subjects</a
+          >
+        </td>
+
+        <td>
+          <a
+            href="#"
+            [class]="
+              class.classTeacher?.name
+                ? 'text-blue-500 font-medium hover:underline'
+                : ''
+            "
+            (click)="
+              selectedTeacher = class.classTeacher;
+              opt.show($event);
+              $event.preventDefault()
+            "
+            >{{
+              class.classTeacher?.name ||
+                class.classTeacher?.fname ||
+                "Not Assigned"
+            }}</a
+          >
+        </td>
+        <td>
+          <div class="flex gap-2">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-pencil"
+              class="p-button-sm p-button-info"
+              pTooltip="Edit Class"
+              tooltipPosition="top"
+              (click)="editClass(class)"
+            ></button>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-trash"
+              class="p-button-sm p-button-danger"
+              pTooltip="Delete Class"
+              tooltipPosition="top"
+              (click)="deleteClass(class)"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- Empty -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7">No Classes found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<!-- Dialog: Add/Edit Class -->
+<p-dialog
+  header="{{ isEditMode ? 'Edit Class' : 'Add New Class' }}"
+  [(visible)]="displayDialog"
+  [modal]="true"
+  [dismissableMask]="false"
+  [closeOnEscape]="false"
+  [blockScroll]="true"
+  [style]="{ width: '40vw', maxHeight: '90vh' }"
+>
+  <app-create-class
+    (close)="showClassForm = false"
+    [class]="editClassRoom"
+    [isEditMode]="isEditMode"
+    (saved)="showAllClasses()"
+  ></app-create-class>
+</p-dialog>
+
+<p-popover #op (onHide)="selectedSubject = []">
+  <ng-template #content>
+    <div *ngIf="selectedSubject?.length > 0" class="w-[46rem] p-2">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-lg font-semibold mb-3">Subjects List</p>
+        <p-button
+          label="Manage Subjects"
+          variant="text"
+          routerLink="/principal/manage-subjects"
+        >
+        </p-button>
+      </div>
+      <p-table [value]="selectedSubject" [style]="{ 'font-size': '0.85rem' }">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Subject</th>
+            <th>Code</th>
+            <th>Teacher</th>
+            <th>Email</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-subject>
+          <tr>
+            <td>{{ subject.name }}</td>
+            <td>{{ subject.code }}</td>
+            <td>
+              {{ subject.teacher?.name || subject.teacher?.fname || "-" }}
+            </td>
+            <td>{{ subject.teacher?.email || "—" }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <div
+      *ngIf="selectedSubject?.length === 0"
+      class="text-center text-sm text-gray-400 p-3"
+    >
+      No subjects found.
+    </div>
+  </ng-template>
+</p-popover>
+<p-popover #opt (onHide)="selectedTeacher = null; selectedSubject = []">
+  <ng-template #content>
+    <div class="w-[40rem] p-4">
+      <!-- Teacher Profile Section -->
+      <div *ngIf="selectedTeacher" class="flex items-center gap-4 mb-4">
+        <!-- Avatar -->
+        <img
+          [src]="selectedTeacher.photo || 'assets/user-avatar.png'"
+          alt="Teacher"
+          class="w-16 h-16 rounded-full border object-cover"
+        />
+
+        <!-- Info -->
+        <div>
+          <p class="text-lg font-semibold text-gray-800">
+            {{ selectedTeacher.name }}
+          </p>
+          <p class="text-sm text-gray-600">{{ selectedTeacher.email }}</p>
+          <p *ngIf="selectedTeacher.phone" class="text-sm text-gray-600">
+            📞 {{ selectedTeacher.phone }}
+          </p>
+        </div>
+
+        <!-- Button -->
+        <p-button
+          label="Manage Subjects"
+          icon="pi pi-cog"
+          routerLink="/principal/manage-subjects"
+          class="ml-auto"
+          variant="text"
+        ></p-button>
+      </div>
+
+      <!-- Subjects -->
+      <div *ngIf="selectedSubject?.length > 0">
+        <p class="text-base font-semibold mb-2">Assigned Subjects</p>
+        <p-table [value]="selectedSubject" [style]="{ 'font-size': '0.85rem' }">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Subject</th>
+              <th>Code</th>
+              <th>Class</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-subject>
+            <tr>
+              <td>{{ subject.name }}</td>
+              <td>{{ subject.code }}</td>
+              <td>{{ subject.classroom?.name || "—" }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <!-- No Subjects -->
+      <div
+        *ngIf="selectedSubject?.length === 0"
+        class="text-center text-gray-400 text-sm pt-6"
+      >
+        No subjects assigned to this teacher.
+      </div>
+    </div>
+  </ng-template>
+</p-popover>

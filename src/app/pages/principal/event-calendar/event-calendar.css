@@ -1,0 +1,53 @@
+/* calendar.component.css */
+:host, .calendar-page {
+  display: block;
+  height: 100vh;            /* fill screen */
+  overflow: hidden;         /* prevent page scrollbars */
+}
+
+/* Card takes full height and becomes a flex column */
+.calendar-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* PrimeNG Card body needs to stretch + hide overflow */
+:host ::ng-deep .p-card .p-card-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+/* Toolbar stays fixed at the top inside card */
+.toolbar {
+  flex: 0 0 auto;
+  margin-bottom: .75rem;
+}
+
+/* Calendar area fills remaining space */
+.calendar-wrap {
+  flex: 1 1 auto;
+  min-height: 0;            /* critical to allow child to size properly */
+  overflow: hidden;
+}
+
+/* FullCalendar should fill available height */
+.fc-full {
+  display: block;
+  height: 100%;
+}
+:host ::ng-deep .fc {
+  height: 100%;
+}
+:host ::ng-deep .fc-scroller {
+  overflow: auto;           /* inner scroll only (no page overflow) */
+}
+
+/* Dialog content scrolls within dialog (not the page) */
+:host ::ng-deep .p-dialog .p-dialog-content {
+  max-height: 70vh;
+  overflow: auto;
+}

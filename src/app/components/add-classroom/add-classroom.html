@@ -1,0 +1,100 @@
+<p-toast></p-toast>
+
+<div styleClass="w-full mx-auto p-4">
+  <ng-template pTemplate="header">
+    <div
+      class="flex justify-between items-center px-6 py-3 border-b border-gray-300 mb-4"
+    >
+      <span class="font-semibold text-2xl">Create Class</span>
+    </div>
+  </ng-template>
+
+  <form [formGroup]="classForm" class="grid grid-cols-1 md:grid-cols-1 gap-4">
+    <!-- Class Name -->
+    <div>
+      <label class="block text-xs mb-1"
+        >Class Name <span class="text-red-500">*</span></label
+      >
+      <p-select
+        formControlName="name"
+        [appendTo]="'body'"
+        [filter]="true"
+        [options]="classNames"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select Class"
+        class="w-full"
+      ></p-select>
+    </div>
+
+    <!-- Section -->
+    <div>
+      <label class="block text-xs mb-1"
+        >Section <span class="text-red-500">*</span></label
+      >
+      <p-select
+        formControlName="section"
+        [options]="sections"
+        [filter]="true"
+        optionLabel="label"
+        [appendTo]="'body'"
+        optionValue="value"
+        placeholder="Select Section"
+        class="w-full"
+      ></p-select>
+    </div>
+
+    <!-- Academic Year -->
+    <div>
+      <label class="block text-xs mb-1"
+        >Academic Year <span class="text-red-500">*</span></label
+      >
+      <p-select
+        formControlName="academicYear"
+        [options]="academicYears"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select Year"
+        [appendTo]="'body'"
+        class="w-full"
+      ></p-select>
+    </div>
+
+    <!-- Class Teacher -->
+    <div>
+      <label class="block text-xs mb-1"
+        >Class Teacher <span class="text-red-500">*</span></label
+      >
+      <p-select
+        formControlName="classTeacher"
+        [options]="teacherNames"
+        optionLabel="label"
+        name="classTeacher"
+        optionValue="value"
+        [filter]="true"
+        placeholder="Select Teacher"
+        [appendTo]="'body'"
+        class="w-full"
+      ></p-select>
+    </div>
+  </form>
+
+  <!-- Actions -->
+  <div class="flex justify-end gap-3 mt-6">
+    <button
+      pButton
+      label="Reset"
+      class="p-button-secondary"
+      (click)="resetForm()"
+    ></button>
+
+    <button
+      pButton
+      [label]="isEditMode ? 'Edit Class' : 'Add Class'"
+      icon="pi pi-check"
+      (click)="submitClass()"
+      [disabled]="classForm.invalid || loading"
+      [loading]="loading"
+    ></button>
+  </div>
+</div>

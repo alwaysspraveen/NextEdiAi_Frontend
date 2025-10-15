@@ -1,0 +1,178 @@
+<p-toast></p-toast>
+
+<!-- Top bar -->
+<div class="flex flex-wrap items-center gap-3 mb-3">
+  <p-select
+    [options]="academicYears"
+    [(ngModel)]="selectedYear"
+    placeholder="Academic Year"
+    styleClass="w-44"
+  ></p-select>
+
+  <p-select
+    [options]="classrooms"
+    [(ngModel)]="selectedClassId"
+    optionLabel="name"
+    [showClear]="true"
+    optionValue="_id"
+    placeholder="Class / Section"
+    styleClass="w-56"
+    (onChange)="onClassChange($event.value)"
+  >
+  </p-select>
+
+  <p-datepicker
+    [(ngModel)]="selectedWeek"
+    view="date"
+    dateFormat="dd M yy"
+    [showIcon]="true"
+  ></p-datepicker>
+
+  <span class="ml-auto"></span>
+  <p-button
+    label="Auto-Generate"
+    icon="pi pi-magic"
+    (onClick)="autoGenerate()"
+  ></p-button>
+  <p-button
+    label="Validate"
+    icon="pi pi-check-circle"
+    severity="secondary"
+    (onClick)="validate()"
+  ></p-button>
+  <p-button
+    label="Publish"
+    icon="pi pi-upload"
+    severity="success"
+    (onClick)="publish()"
+  ></p-button>
+  <p-button
+    label="Reset"
+    icon="pi pi-refresh"
+    severity="danger"
+    (onClick)="resetGrid()"
+  ></p-button>
+</div>
+
+<!-- Layout -->
+<div class="grid grid-cols-10 gap-4">
+  <!-- Left tools -->
+  <div class="col-span-12 lg:col-span-2 space-y-3">
+    <p-panel header="Subjects">
+      <div class="flex flex-col gap-2 max-h-[30vh] overflow-auto">
+        <div *ngFor="let s of subjects" class="text-sm">
+          <div class="font-medium">{{ s.label }}</div>
+        </div>
+      </div>
+    </p-panel>
+
+    <p-panel header="Teachers">
+      <div class="flex flex-col gap-2 max-h-[30vh] overflow-auto">
+        <div *ngFor="let t of teachers" class="text-sm">{{ t.label }}</div>
+      </div>
+    </p-panel>
+
+    <p-panel header="Conflicts">
+      <ul class="list-disc pl-5 text-sm max-h-[60vh] overflow-auto">
+        <li *ngFor="let c of conflicts()">{{ c }}</li>
+        <li *ngIf="!conflicts().length" class="opacity-60">No conflicts</li>
+      </ul>
+    </p-panel>
+  </div>
+
+  <!-- Grid -->
+  <div class="col-span-12 lg:col-span-8">
+    <div class="rounded shadow overflow-hidden">
+      <p-table [value]="days" [scrollable]="true" [scrollHeight]="'60vh'">
+        <!-- Header: Periods -->
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="sticky top-0 bg-white z-10 w-28">Day</th>
+            <th
+              *ngFor="let p of periods"
+              class="sticky top-0 bg-white z-10 text-center"
+              [ngClass]="{ 'bg-surface-100': p.isBreak }"
+            >
+              {{ p.label }}
+            </th>
+          </tr>
+        </ng-template>
+
+        <!-- Rows -->
+        <ng-template pTemplate="body" let-day>
+          <tr>
+            <td class="font-medium">{{ day }}</td>
+            <td
+              *ngFor="let p of periods"
+              (click)="openAssign(day, p.key)"
+              class="cursor-pointer align-top"
+            >
+              <ng-container *ngIf="!p.isBreak; else breakTpl">
+                <div class="text-sm">
+                  <div class="font-medium">
+                    {{ subjectName(cell(day, p.key)?.subject) }}
+                  </div>
+                  <div class="text-xs opacity-70">
+                    {{ teacherName(cell(day, p.key)?.teacher) }}
+                  </div>
+                </div>
+              </ng-container>
+              <ng-template #breakTpl>
+                <div class="text-left text-xs opacity-70">— Break —</div>
+              </ng-template>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+</div>
+
+<!-- Assign dialog -->
+<p-dialog
+  header="Assign"
+  [(visible)]="assignVisible"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+>
+  <div class="flex flex-col gap-3">
+    <p-select
+      [options]="teachers"
+      optionLabel="label"
+      optionValue="value"
+      [(ngModel)]="assignTeacherId"
+      [filter]="true"
+      [showClear]="true"
+      appendTo="body"
+      placeholder="Select teacher"
+    >
+    </p-select>
+
+    <p-select
+      [options]="subjects"
+      optionLabel="label"
+      optionValue="value"
+      [(ngModel)]="assignSubjectId"
+      [filter]="true"
+      [showClear]="true"
+      appendTo="body"
+      placeholder="Select subject"
+    >
+    </p-select>
+
+    <div class="flex justify-end gap-2 pt-2">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        (onClick)="assignVisible = false"
+      ></p-button>
+      <p-button
+        label="Save"
+        icon="pi pi-check"
+        (onClick)="saveAssign()"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>

@@ -1,0 +1,49 @@
+<div class="flex justify-center items-center h-full w-full">
+  <p-card>
+    <div class="flex flex-col justify-center gap-6 items-center p-4 h-96 w-89">
+      <div class="flex flex-col justify-center gap-2 items-start w-full">
+        <h1 class="font-semibold text-3xl text-left">Login</h1>
+        <p class="text-gray-400 text-xs">Enter your email and password</p>
+      </div>
+      <form
+        (ngSubmit)="onLogin()"
+        class="flex flex-col justify-center gap-6.5 w-full"
+      >
+        <p-iconfield>
+          <p-inputicon class="pi pi-user" />
+          <input
+            type="text"
+            [(ngModel)]="email"
+            pInputText
+            placeholder="Email"
+            class="w-full"
+            name="email"
+            autocomplete="off"
+          />
+        </p-iconfield>
+        <p-iconfield>
+          <p-inputicon class="pi pi-lock" />
+          <p-password
+            [(ngModel)]="password"
+            [feedback]="false"
+            placeholder="Password"
+            [toggleMask]="true"
+            name="password"
+            styleClass="!w-full"
+            autocomplete="off"
+            inputStyleClass="!w-full"
+          />
+        </p-iconfield>
+
+        <p-button type="submit" label="Submit" styleClass="!w-full" />
+        <a class="cursor-pointer text-blue-600 text-right text-sm"
+          >Forgot Password?</a
+        >
+      </form>
+    </div>
+  </p-card>
+</div>
+
+<p-toast
+  [breakpoints]="{ '920px': { width: '100%', right: '0', left: '0' } }"
+/>

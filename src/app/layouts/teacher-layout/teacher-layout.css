@@ -1,0 +1,4 @@
+/* Completely remove all menu borders */
+:host ::ng-deep .custom-menu {
+  border: none !important; /* Removes outer menu border */
+}

@@ -1,0 +1,120 @@
+<!-- calendar.component.html -->
+<div class="flex flex-col gap-2 h-[calc(100vh-4rem)]">
+  <p-card styleClass="calendar-card">
+    <div class="toolbar">
+      <p-button
+        label="Create Event"
+        icon="pi pi-plus"
+        (click)="showDialog = true; isEditing = false"
+      ></p-button>
+    </div>
+
+    <div class="calendar-wrap">
+      <full-calendar
+        #calendar
+        [options]="options"
+        class="fc-full"
+      ></full-calendar>
+    </div>
+  </p-card>
+
+  <p-dialog
+    [(visible)]="showDialog"
+    [modal]="true"
+    [closable]="true"
+    header="Create Event"
+    [style]="{ width: 'auto' }"
+    [contentStyle]="{ 'max-height': '70vh', overflow: 'auto' }"
+  >
+    <form class="p-fluid space-y-4" (ngSubmit)="saveEvent()">
+      <label for="title">Title</label>
+      <div class="p-float-label">
+        <input
+          pInputText
+          id="title"
+          name="title"
+          class="w-full"
+          [(ngModel)]="form.title"
+        />
+      </div>
+
+      <!-- Description -->
+      <div class="p-float-label">
+        <label for="description">Description</label>
+        <textarea
+          pInputTextarea
+          id="description"
+          name="description"
+          rows="3"
+          class="w-full"
+          [(ngModel)]="form.description"
+        ></textarea>
+      </div>
+
+      <!-- Dates -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-float-label">
+          <label for="start">Start</label>
+          <p-datepicker
+            id="start"
+            name="start"
+            [(ngModel)]="form.start"
+            [showTime]="true"
+            hourFormat="12"
+            [showIcon]="true"
+            style="width: 100%"
+          ></p-datepicker>
+        </div>
+
+        <div class="p-float-label">
+          <label for="end">End</label>
+          <p-datepicker
+            id="end"
+            name="end"
+            [(ngModel)]="form.end"
+            [showTime]="true"
+            hourFormat="12"
+            [showIcon]="true"
+            [minDate]="form.start || null"
+            style="width: 100%"
+          ></p-datepicker>
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="p-float-label">
+        <label for="location">Location</label>
+        <input
+          pInputText
+          id="location"
+          name="location"
+          class="w-full"
+          [(ngModel)]="form.location"
+        />
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-2 pt-2">
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          class="p-button-text"
+          (click)="showDialog = false"
+        ></button>
+        <button
+          pButton
+          type="submit"
+          label="Save"
+          [disabled]="
+            !form.title ||
+            !form.start ||
+            !form.end ||
+            (form.start && form.end && form.end <= form.start)
+          "
+        ></button>
+      </div>
+    </form>
+  </p-dialog>
+</div>
+<p-toast></p-toast>

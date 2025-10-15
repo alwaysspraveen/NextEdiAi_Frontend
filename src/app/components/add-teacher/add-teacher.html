@@ -1,0 +1,231 @@
+<p-toast></p-toast>
+
+<!-- 12-col grid across the whole form -->
+<form [formGroup]="form" class="grid grid-cols-1 md:grid-cols-6 gap-4">
+  <!-- Basic -->
+  <div class="md:col-span-12 font-semibold text-sm opacity-80">
+    Basic Details
+  </div>
+
+  <!-- Use styleClass on p-card; wrap contents in a grid -->
+  <p-card styleClass="md:col-span-12">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >First Name<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="fname"
+          formControlName="fname"
+          p
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1">Middle Name</label>
+        <input
+          pInputText
+          id="mname"
+          formControlName="mname"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Last Name<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="lname"
+          formControlName="lname"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Email<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          type="email"
+          id="email"
+          formControlName="email"
+          p
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Phone<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          type="tel"
+          id="phone"
+          formControlName="phone"
+          name="phone"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Password<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="name"
+          formControlName="password"
+          type="password"
+          name="password"
+          autocomplete="off"
+          [toggleMask]="true"
+          class="w-full"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1">Resedential Address*</label>
+        <textarea
+          rows="1"
+          cols="30"
+          pTextarea
+          name="address"
+          formControlName="address"
+          placeholder="Address"
+        ></textarea>
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Date of Birth<span class="text-red-500">*</span></label
+        >
+        <p-datepicker
+          class="w-full"
+          formControlName="dob"
+          [appendTo]="'body'"
+          placeholder="Select date of birth"
+          dateFormat="dd M yy"
+          inputId="dob"
+          [showIcon]="true"
+        ></p-datepicker>
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Gender<span class="text-red-500">*</span></label
+        >
+        <p-select
+          class="w-full"
+          formControlName="gender"
+          name="gender"
+          optionValue="value"
+          [options]="genderOptions"
+          optionLabel="label"
+          placeholder="Select Gender"
+        />
+      </div>
+    </div>
+  </p-card>
+
+  <div class="md:col-span-12"><p-divider></p-divider></div>
+
+  <!-- Academic -->
+  <div class="md:col-span-12 font-semibold text-sm opacity-80">
+    Qualification Details
+  </div>
+
+  <p-card styleClass="md:col-span-12">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Qualification<span class="text-red-500">*</span></label
+        >
+        <p-select
+          class="w-full"
+          [options]="qualificationOptions"
+          formControlName="qualification"
+          name="qualification"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select Qualification"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Years of Experience<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="experience"
+          formControlName="experience"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Joining Date<span class="text-red-500">*</span></label
+        >
+        <p-datepicker
+          class="w-full"
+          formControlName="joiningDate"
+          name="joiningDate"
+          dateFormat="dd M yy"
+          inputId="joiningDate"
+          [showIcon]="true"
+        ></p-datepicker>
+      </div>
+    </div>
+  </p-card>
+
+  <div class="md:col-span-12"><p-divider></p-divider></div>
+
+  <!-- Personal -->
+  <div class="md:col-span-12 font-semibold text-sm opacity-80">
+    Teacher Profile Photo<span class="text-red-500">*</span>
+  </div>
+  <p-card styleClass="md:col-span-12">
+    <div class="md:col-span-12 flex justify-start gap-2 mt-2">
+      <p-fileupload
+        #fu
+        mode="basic"
+        chooseLabel="Choose"
+        chooseIcon="pi pi-upload"
+        name="demo[]"
+        url="https://www.primefaces.org/cdn/api/upload.php"
+        accept="image/*"
+        maxFileSize="1000000"
+        (onUpload)="onUpload($event)"
+      />
+      <p-button label="Upload" (onClick)="fu.upload()" severity="secondary" />
+    </div>
+  </p-card>
+  <!-- Actions -->
+  <div class="md:col-span-12 flex justify-end gap-2 mt-2">
+    @if (!isEditMode) {
+    <button
+      pButton
+      type="button"
+      label="Reset"
+      class="p-button-secondary"
+      (click)="reset()"
+      [disabled]="loading"
+    ></button>
+    }
+    <button
+      pButton
+      type="button"
+      [label]="isEditMode ? 'Update Teacher' : 'Add Teacher'"
+      icon="pi pi-check"
+      (click)="submit()"
+      [loading]="loading"
+      [disabled]="form.invalid || loading"
+    ></button>
+  </div>
+</form>

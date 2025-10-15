@@ -1,0 +1,484 @@
+<p-toast></p-toast>
+
+<!-- 12-col grid across the whole form -->
+<form [formGroup]="form" class="grid grid-cols-1 md:grid-cols-6 gap-4">
+  <!-- Basic -->
+  <div class="md:col-span-12 font-semibold text-sm opacity-80">
+    Basic Details
+  </div>
+
+  <!-- Use styleClass on p-card; wrap contents in a grid -->
+  <p-card styleClass="md:col-span-12">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >First Name<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="fname"
+          formControlName="fname"
+          p
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1">Middle Name</label>
+        <input
+          pInputText
+          id="mname"
+          formControlName="mname"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Last Name<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="lname"
+          formControlName="lname"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Email<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          type="email"
+          id="email"
+          formControlName="email"
+          p
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Phone<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          type="tel"
+          id="phone"
+          formControlName="phone"
+          name="phone"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Password<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="name"
+          formControlName="password"
+          type="password"
+          name="password"
+          autocomplete="off"
+          [toggleMask]="true"
+          class="w-full"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1">Resedential Address*</label>
+        <textarea
+          rows="1"
+          cols="30"
+          pTextarea
+          name="address"
+          formControlName="address"
+          placeholder="Address"
+        ></textarea>
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Date of Birth<span class="text-red-500">*</span></label
+        >
+        <p-datepicker
+          class="w-full"
+          formControlName="dob"
+          placeholder="Select date of birth"
+          dateFormat="dd M yy"
+          inputId="dob"
+          [showIcon]="true"
+        ></p-datepicker>
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Gender<span class="text-red-500">*</span></label
+        >
+        <p-select
+          class="w-full"
+          formControlName="gender"
+          name="gender"
+          optionValue="value"
+          [options]="genderOptions"
+          optionLabel="label"
+          placeholder="Select Gender"
+        />
+      </div>
+    </div>
+  </p-card>
+
+  <div class="md:col-span-12"><p-divider></p-divider></div>
+
+  <!-- Academic -->
+  <div class="md:col-span-12 font-semibold text-sm opacity-80">
+    Academic Details
+  </div>
+
+  <p-card styleClass="md:col-span-12">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Admission No<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="admissionNo"
+          formControlName="admissionNo"
+          name="admissionNo"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Roll No<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="rollNo"
+          formControlName="rollNo"
+          name="rollNo"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Class<span class="text-red-500">*</span></label
+        >
+        <p-select
+          class="w-full"
+          formControlName="class"
+          name="class"
+          optionValue="value"
+          [options]="classOptions"
+          optionLabel="label"
+          placeholder="Select Class"
+        />
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1">Section</label>
+        <p-select
+          class="w-full"
+          [options]="sectionOptions"
+          formControlName="section"
+          name="section"
+          optionValue="value"
+          optionLabel="label"
+          placeholder="Select Section"
+        />
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Academic Year<span class="text-red-500">*</span></label
+        >
+        <p-select
+          class="w-full"
+          [options]="yearOptions"
+          formControlName="academicYear"
+          name="academicYear"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select Academic Year"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Enrollment Date<span class="text-red-500">*</span></label
+        >
+        <p-datepicker
+          class="w-full"
+          formControlName="enrollmentDate"
+          name="enrollmentDate"
+          dateFormat="dd M yy"
+          inputId="enrollmentDate"
+          [showIcon]="true"
+        ></p-datepicker>
+      </div>
+    </div>
+  </p-card>
+
+  <div class="md:col-span-12"><p-divider></p-divider></div>
+
+  <!-- Personal -->
+  <div class="md:col-span-12 font-semibold text-sm opacity-80">
+    Personal Information
+  </div>
+
+  <p-card styleClass="md:col-span-12">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >National ID/Aadhaar No/SSN<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="idCardNo"
+          formControlName="idCardNo"
+          name="idCardNo"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1">Catrgory (if applicable)</label>
+        <p-select
+          class="w-full"
+          formControlName="category"
+          [options]="categoryOption"
+          name="category"
+          optionValue="value"
+          optionLabel="label"
+          placeholder="Select Catrgory"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1">Religion</label>
+        <p-select
+          class="w-full"
+          formControlName="religion"
+          name="religion"
+          optionValue="value"
+          [options]="religionOption"
+          optionLabel="label"
+          placeholder="Select Catrgory"
+        />
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1">Blood Group</label>
+        <p-select
+          class="w-full"
+          [options]="bloodOptions"
+          formControlName="bloodGroup"
+          name="bloodGroup"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select Blood Group"
+        />
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Emergency Contact<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="emergencyContact"
+          formControlName="emergencyContact"
+          name="emergencyContact"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+    </div>
+  </p-card>
+  <div class="md:col-span-12"><p-divider></p-divider></div>
+
+  <div class="md:col-span-12 font-semibold text-sm opacity-80">
+    Parent Information
+  </div>
+
+  <p-card styleClass="md:col-span-12">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Name<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="guardianName"
+          formControlName="guardianName"
+          name="guardianName"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Email<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="guardianEmail"
+          formControlName="guardianEmail"
+          name="guardianEmail"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Contact<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="guardianPhone"
+          formControlName="guardianPhone"
+          name="guardianPhone"
+          autocomplete="off"
+          class="w-full"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1">Relation</label>
+        <p-select
+          class="w-full"
+          formControlName="guardianRelation"
+          name="guardianRelation"
+          optionValue="value"
+          [filter]="true"
+          [options]="relationOptions"
+          optionLabel="label"
+          placeholder="Select Relation"
+        />
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >Address<span class="text-red-500">*</span></label
+        >
+        <textarea
+          rows="1"
+          cols="30"
+          pTextarea
+          name="guardianAddress"
+          formControlName="guardianAddress"
+          placeholder="Enter Address"
+        ></textarea>
+      </div>
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1">Country</label>
+        <p-select
+          class="w-full"
+          [appendTo]="'body'"
+          id="guardianCountry"
+          formControlName="guardianCountry"
+          name="guardianCountry"
+          optionValue="value"
+          [options]="countryOptions"
+          [filter]="true"
+          optionLabel="label"
+          placeholder="Select Catrgory"
+        />
+      </div>
+      @if (form.get('guardianCountry')?.value) {
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1">State</label>
+        <p-select
+          class="w-full"
+          formControlName="guardianState"
+          name="guardianState"
+          optionValue="value"
+          [filter]="true"
+          [options]="stateOptions"
+          optionLabel="label"
+          placeholder="Select State"
+        />
+      </div>
+      } @if (form.get('guardianState')?.value) {
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1">City</label>
+        <p-select
+          class="w-full"
+          formControlName="guardianCity"
+          name="guardianCity"
+          optionValue="value"
+          [filter]="true"
+          [options]="cityOptions"
+          optionLabel="label"
+          placeholder="Select City"
+        />
+      </div>
+      }
+      <div class="md:col-span-4">
+        <label class="block text-xs mb-1"
+          >ZIP Code<span class="text-red-500">*</span></label
+        >
+        <input
+          pInputText
+          id="guardianZip"
+          formControlName="guardianZip"
+          name="guardianZip"
+          autocomplete="off"
+          placeholder="Enter ZIP Code"
+          class="w-full"
+        />
+      </div>
+    </div>
+  </p-card>
+  <div class="md:col-span-12"><p-divider></p-divider></div>
+
+  <!-- Personal -->
+  <div class="md:col-span-12 font-semibold text-sm opacity-80">
+    Student Profile Photo<span class="text-red-500">*</span>
+  </div>
+  <p-card styleClass="md:col-span-12">
+    <div class="md:col-span-12 flex justify-start gap-2 mt-2">
+      <p-fileupload
+        #fu
+        mode="basic"
+        chooseLabel="Choose"
+        chooseIcon="pi pi-upload"
+        name="demo[]"
+        url="https://www.primefaces.org/cdn/api/upload.php"
+        accept="image/*"
+        maxFileSize="1000000"
+        (onUpload)="onUpload($event)"
+      />
+      <p-button label="Upload" (onClick)="fu.upload()" severity="secondary" />
+    </div>
+  </p-card>
+  <!-- Actions -->
+  <div class="md:col-span-12 flex justify-end gap-2 mt-2">
+    @if (!isEditMode) {
+    <button
+      pButton
+      type="button"
+      label="Reset"
+      class="p-button-secondary"
+      (click)="reset()"
+      [disabled]="loading"
+    ></button>
+    }
+    <button
+      pButton
+      type="button"
+      [label]="isEditMode ? 'Update Student' : 'Add Student'"
+      icon="pi pi-check"
+      (click)="submit()"
+      [disabled]="form.invalid"
+    ></button>
+  </div>
+</form>

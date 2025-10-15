@@ -1,0 +1,143 @@
+<form
+  [formGroup]="attendanceForm"
+  class="grid grid-cols-12 gap-4 h-[calc(100vh-8rem)] text-sm"
+>
+  <!-- Left: filters + table -->
+  <div class="col-span-9 flex flex-col w-full">
+    <!-- Filters -->
+    <div class="grid grid-cols-12 gap-3 mb-3">
+      <p-select
+        class="col-span-5"
+        formControlName="classId"
+        [options]="classes"
+        optionLabel="name"
+        optionValue="_id"
+        placeholder="Select Class"
+        [showClear]="true"
+        (onChange)="onClassChange()"
+      ></p-select>
+
+      <p-datepicker
+        class="col-span-4"
+        formControlName="date"
+        [showIcon]="true"
+        (onSelect)="onDateChange()"
+      ></p-datepicker>
+
+      <div class="col-span-3 flex gap-2 justify-end">
+        <button
+          pButton
+          type="button"
+          label="Load Students"
+          (click)="loadStudents()"
+          class="p-button-sm p-button-secondary"
+        ></button>
+        <button
+          pButton
+          type="button"
+          label="Save"
+          (click)="save()"
+          [disabled]="saving || !students.length"
+          class="p-button-sm p-button-success"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Table (only content scrolls) -->
+    <div class="flex-1 overflow-hidden">
+      <p-table
+        [value]="students"
+        [scrollable]="true"
+        scrollHeight="flex"
+        class="shadow-md h-full"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="w-24">Roll No</th>
+            <th class="min-w-[16rem]">Name</th>
+            <th class="w-24 text-center">Present</th>
+            <th class="w-24 text-center">Absent</th>
+            <th class="w-32">Note</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-student let-rowIndex="rowIndex">
+          <tr>
+            <td>{{ student.rollNo || rowIndex + 1 }}</td>
+            <td>{{ student.name || student.fname + " " + student.lname }}</td>
+
+            <td class="text-center">
+              <p-radioButton
+                name="status-{{ student._id }}"
+                value="present"
+                [(ngModel)]="attendance[student._id]"
+                [ngModelOptions]="{ standalone: true }"
+                (onClick)="markAttendance(student._id, 'present')"
+              >
+              </p-radioButton>
+            </td>
+
+            <td class="text-center">
+              <p-radioButton
+                name="status-{{ student._id }}"
+                value="absent"
+                [(ngModel)]="attendance[student._id]"
+                [ngModelOptions]="{ standalone: true }"
+                (onClick)="markAttendance(student._id, 'absent')"
+              >
+              </p-radioButton>
+            </td>
+
+            <td>
+              <input
+                pInputText
+                type="text"
+                [(ngModel)]="student.note"
+                [ngModelOptions]="{ standalone: true }"
+                name="note-{{ student._id }}"
+                placeholder="Optional"
+              />
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="text-center py-6">
+              Select a class and date, then click <b>Load Students</b>.
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- Right: calendar + stats -->
+  <div class="col-span-3 space-y-4 overflow-auto">
+    <!-- Right panel (outside or inside the same layout is fine) -->
+    <p-datepicker
+      class="w-full"
+      [(ngModel)]="selectedDate"
+      [ngModelOptions]="{ standalone: true }"
+      [inline]="true"
+      [showWeek]="true"
+      (onSelect)="onInlineDateChange($event)"
+    >
+    </p-datepicker>
+
+    <div class="bg-yellow-100 p-4 rounded shadow text-center">
+      <h3 class="text-lg font-semibold">👨‍🎓 {{ totalStudents }}</h3>
+      <p class="text-xs">Total Students</p>
+    </div>
+
+    <div class="bg-green-100 p-4 rounded shadow text-center">
+      <h3 class="text-lg font-semibold">✅ {{ presentCount }}</h3>
+      <p class="text-xs">Present Today</p>
+    </div>
+
+    <div class="bg-red-100 p-4 rounded shadow text-center">
+      <h3 class="text-lg font-semibold">😢 {{ absentCount }}</h3>
+      <p class="text-xs">Absent Today</p>
+    </div>
+  </div>
+</form>

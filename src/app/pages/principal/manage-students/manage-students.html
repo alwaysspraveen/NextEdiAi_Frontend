@@ -1,0 +1,145 @@
+<div class="flex flex-col h-[calc(100vh-6rem)]">
+  <p-table
+    #dt2
+    [value]="users"
+    [scrollable]="true"
+    scrollHeight="flex"
+    dataKey="_id"
+    [rows]="10"
+    [paginator]="true"
+    class="flex-1 text-sm"
+    [tableStyle]="{ 'min-width': '65rem' }"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [globalFilterFields]="['fname', 'rollNo', 'subjectList']"
+    [tableStyle]="{ 'min-width': '65rem', radous: '16px' }"
+  >
+    <!-- Caption / Global Search -->
+    <ng-template pTemplate="caption">
+      <div class="flex items-center justify-between gap-3">
+        <p class="text-xl font-semibold text-gray-800">Manage Students</p>
+        <div class="flex items-center gap-3">
+          <p-button
+            label="Add Student"
+            icon="pi pi-user-plus"
+            (onClick)="
+              showStudentForm = true; isEditMode = false; editing = null
+            "
+          />
+          <p-select
+            [appendTo]="'body'"
+            [filter]="true"
+            [(ngModel)]="selectedClass"
+            name=""
+            [options]="classNames"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select Class"
+            [showClear]="true"
+            class="w-56"
+            (onChange)="onClassChange($event)"
+          >
+          </p-select>
+          <p-iconfield iconPosition="left" class="ml-auto">
+            <p-inputicon>
+              <i class="pi pi-search"></i>
+            </p-inputicon>
+            <input
+              pInputText
+              type="text"
+              placeholder="Search by name, email or subject"
+              (input)="dt2.filterGlobal($event.target.value, 'contains')"
+            />
+          </p-iconfield>
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- Column Headers -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>Roll Number</th>
+        <th>Class</th>
+        <th>Section</th>
+        <th>Guardian/Parent Name</th>
+        <th>Guardian/Parent Phone</th>
+        <th>Action</th>
+      </tr>
+    </ng-template>
+
+    <!-- Body -->
+    <ng-template pTemplate="body" let-student>
+      <tr
+        [pSelectableRow]="student"
+        [attr.data-id]="student._id"
+        [attr.data-email]="student.email"
+      >
+        <td>
+          {{
+            student.fname && student.lname
+              ? student.fname + " " + student.lname
+              : student.name
+          }}
+        </td>
+        <td class="truncate">{{ student.rollNo }}</td>
+        <td class="truncate">{{ student.class?.name }}</td>
+        <td class="truncate">{{ student.class?.section }}</td>
+        <td class="truncate">
+          {{ student.guardianName }}
+        </td>
+        <td class="truncate">
+          {{
+            student.guardianPhone ? "+91" + " " + student.guardianPhone : "-"
+          }}
+        </td>
+        <td>
+          <div class="flex gap-2">
+            <button
+              pButton
+              type="button"
+              icon="pi pi-pencil"
+              class="p-button-sm p-button-info"
+              pTooltip="Edit student"
+              tooltipPosition="top"
+              (click)="editStudent(student)"
+            ></button>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-trash"
+              class="p-button-sm p-button-danger"
+              pTooltip="Delete student"
+              tooltipPosition="top"
+              (click)="deleteStudent(student)"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- Empty -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7">No students found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<p-toast></p-toast>
+
+<p-dialog
+  header="{{ editing ? 'Edit Student' : 'Add New Student' }}"
+  [(visible)]="showStudentForm"
+  [modal]="true"
+  [dismissableMask]="false"
+  [closeOnEscape]="false"
+  [blockScroll]="true"
+  styleClass="w-fit h-[90vh] max-h-screen mx-auto p-2 overflow-auto"
+>
+  <app-add-student
+    (close)="showStudentForm = false"
+    [student]="editing"
+    [isEditMode]="isEditMode"
+    (saved)="loadUsers()"
+  ></app-add-student>
+</p-dialog>

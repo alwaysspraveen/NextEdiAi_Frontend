@@ -1,0 +1,312 @@
+<p-toolbar class="mb-4">
+  <div class="p-toolbar-group-left flex items-center gap-2">
+    <span class="text-xl font-semibold">Manage Leaves</span>
+  </div>
+
+  <div class="p-toolbar-group-right flex items-center gap-3">
+    <!-- ✅ FIX: p-select ➜ p-dropdown -->
+    <p-select
+      [options]="statusOptions"
+      [ngModel]="statusControl.value"
+      (onChange)="statusControl.setValue($event.value)"
+      placeholder="Status"
+      styleClass="w-40"
+    ></p-select>
+
+    <!-- ✅ FIX: p-datapicker ➜ p-calendar -->
+    <p-datepicker
+      selectionMode="range"
+      [showIcon]="true"
+      [ngModel]="dateRange.value"
+      dateFormat="dd M yy"
+      placeholder="Date range"
+      styleClass="w-60"
+    ></p-datepicker>
+
+    <button
+      pButton
+      label="Refresh"
+      icon="pi pi-refresh"
+      (click)="fetch()"
+    ></button>
+  </div>
+</p-toolbar>
+
+<p-table
+  [value]="rows()"
+  [loading]="loading()"
+  dataKey="_id"
+  [rowHover]="true"
+  [paginator]="true"
+  [rows]="10"
+  [rowsPerPageOptions]="[10, 20, 50]"
+  [tableStyle]="{ 'font-size': '0.9rem' }"
+  [responsiveLayout]="'scroll'"
+  [selection]="selected()"
+  (selectionChange)="onSelectionChange($event)"
+  [rowTrackBy]="trackById"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th style="width: 3rem">
+        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+      </th>
+      <th>Teacher</th>
+      <th>Type</th>
+      <th>Dates</th>
+      <th>Periods</th>
+      <th>Status</th>
+      <th>Applied</th>
+      <th class="text-right">Actions</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-row>
+    <tr>
+      <td><p-tableCheckbox [value]="row"></p-tableCheckbox></td>
+
+      <td>
+        <div class="font-medium">{{ teacherName(row) }}</div>
+        <div class="text-xs text-muted">{{ teacherDept(row.teacherId) }}</div>
+      </td>
+
+      <td><p-tag [value]="row.type" severity="info"></p-tag></td>
+
+      <td class="whitespace-nowrap">
+        {{ row.startDate | date : "dd MMM, y" }} –
+        {{ row.endDate | date : "dd MMM, y" }}
+      </td>
+
+      <td>
+        <span
+          class="text-xs text-blue-600 hover:underline cursor-pointer"
+          (click)="openLeavePopover(row, leavePopover)"
+          >{{ row.periods?.length || 0 }} slot(s)</span
+        >
+      </td>
+
+      <td>
+        <p-tag
+          [value]="row.status"
+          [severity]="statusSeverity(row.status)"
+        ></p-tag>
+      </td>
+
+      <td>
+        <span class="text-xs">{{
+          row.createdAt | date : "dd MMM, y HH:mm"
+        }}</span>
+      </td>
+
+      <td class="text-right whitespace-nowrap">
+        <button
+          pButton
+          icon="pi pi-eye"
+          class="p-button-text mr-2"
+          pTooltip="View periods"
+          (click)="openDetails(row)"
+        ></button>
+
+        <button
+          pButton
+          icon="pi pi-check"
+          class="p-button-success mr-2"
+          [disabled]="row.status !== 'PENDING'"
+          (click)="approve(row)"
+          pTooltip="Approve"
+        ></button>
+
+        <button
+          pButton
+          icon="pi pi-times"
+          class="p-button-danger p-button-text"
+          [disabled]="row.status !== 'PENDING'"
+          (click)="openReject(row)"
+          pTooltip="Reject"
+        ></button>
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="8" class="text-center py-6 text-muted">No leaves found.</td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<!-- Details -->
+<p-drawer
+  [visible]="detailsOpen()"
+  (visibleChange)="detailsOpen.set($event)"
+  position="right"
+  [modal]="true"
+  styleClass="w-[36rem]"
+>
+  <ng-container *ngIf="activeLeave() as leave">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <h3 class="text-lg font-semibold">Leave Details</h3>
+        <div class="text-sm text-muted">
+          Teacher: <b>{{ teacherName(leave) }}</b>
+        </div>
+        <div class="text-xs text-muted">
+          Dates: {{ leave.startDate | date : "dd MMM, y" }} –
+          {{ leave.endDate | date : "dd MMM, y" }}
+        </div>
+        <div class="text-xs text-muted">Type: {{ leave.type }}</div>
+      </div>
+      <div class="space-x-2">
+        <button
+          pButton
+          label="Approve"
+          icon="pi pi-check"
+          class="p-button-success"
+          [disabled]="leave.status !== 'PENDING'"
+          (click)="approve(leave)"
+        ></button>
+        <button
+          pButton
+          label="Reject"
+          icon="pi pi-times"
+          class="p-button-danger p-button-text"
+          [disabled]="leave.status !== 'PENDING'"
+          (click)="openReject(leave)"
+        ></button>
+      </div>
+    </div>
+
+    <div class="border rounded-lg">
+      <div class="grid grid-cols-12 px-3 py-2 bg-gray-50 text-xs font-medium">
+        <div class="col-span-4">Date / Period</div>
+        <div class="col-span-4">Class</div>
+        <div class="col-span-4">Subject</div>
+      </div>
+      <div class="max-h-[60vh] overflow-auto">
+        <div
+          class="grid grid-cols-12 px-3 py-2 border-b items-center"
+          *ngFor="let p of periodsForActive(); trackBy: trackByPeriod"
+        >
+          <div class="col-span-4 text-sm">
+            <div class="font-medium">{{ p.date | date : "EEE, dd MMM" }}</div>
+            <div class="text-xs text-muted">{{ p.periodKey }}</div>
+          </div>
+          <div class="col-span-4 text-sm">
+            {{ displayName(p.classroomId) }}
+          </div>
+          <div class="col-span-4 text-sm">
+            {{ displayName(p.subject) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3">
+      <div class="text-xs text-muted">Reason:</div>
+      <div class="text-sm whitespace-pre-line">{{ leave.reason || "—" }}</div>
+    </div>
+  </ng-container>
+</p-drawer>
+
+<!-- Reject dialog -->
+<p-dialog
+  [visible]="rejectOpen()"
+  (visibleChange)="rejectOpen.set($event)"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+  header="Reject Leave"
+  [draggable]="false"
+>
+  <div class="mb-3 text-sm">
+    Add a remark for the teacher explaining the rejection.
+  </div>
+  <textarea
+    pInputTextarea
+    [rows]="5"
+    [autoResize]="true"
+    [formControl]="rejectRemark"
+    placeholder="Reason for rejection"
+  ></textarea>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      label="Cancel"
+      class="p-button-text"
+      (click)="rejectOpen.set(false)"
+    ></button>
+    <button
+      pButton
+      label="Reject"
+      class="p-button-danger"
+      (click)="submitReject()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<p-popover #leavePopover>
+  <ng-template #content>
+    <div class="w-[46rem] p-2">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-lg font-semibold">Leave Periods</p>
+        <p-button
+          label="Manage Leaves"
+          variant="outlined"
+          size="small"
+          routerLink="/principal/manage-leaves"
+        >
+        </p-button>
+      </div>
+
+      <!-- Table -->
+      <p-table
+        [value]="selectedLeave?.periods || []"
+        [style]="{ 'font-size': '0.85rem' }"
+        styleClass="p-datatable-gridlines"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Date / Period</th>
+            <th>Class</th>
+            <th>Subject</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-period>
+          <tr>
+            <td>
+              <div class="font-medium">
+                {{ period.date | date : "EEE, dd MMM" }}
+              </div>
+              <div class="text-xs text-muted">{{ period.periodKey }}</div>
+            </td>
+            <td>
+              {{ displayName(period.classroomId) }}
+            </td>
+            <td>
+              {{ displayName(period.subject) }}
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <!-- Reason -->
+      <div class="mt-3" *ngIf="selectedLeave">
+        <div class="text-xs text-muted">Reason:</div>
+        <div class="text-sm whitespace-pre-line">
+          {{ selectedLeave.reason || "—" }}
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        *ngIf="!selectedLeave?.periods?.length"
+        class="text-center text-sm text-gray-400 p-3"
+      >
+        No leave periods found.
+      </div>
+    </div>
+  </ng-template>
+</p-popover>

@@ -1,0 +1,247 @@
+<!-- TOOLBAR -->
+<p-toolbar class="mb-2 shadow-sm bg-white rounded-lg p-3">
+  <div class="p-toolbar-group-left">
+    <span class="text-2xl font-bold text-gray-800">Attendance Summary</span>
+  </div>
+
+  <div class="p-toolbar-group-right flex items-center gap-4">
+    <!-- Date -->
+    <p-datepicker
+      [(ngModel)]="date"
+      name="date"
+      [showIcon]="true"
+      dateFormat="dd M yy"
+      styleClass="w-44"
+    ></p-datepicker>
+
+    <!-- Class -->
+    <p-select
+      [options]="classroomOptions"
+      [(ngModel)]="classroomId"
+      name="classroomId"
+      [showClear]="true"
+      placeholder="All Classes"
+      styleClass="w-56"
+    ></p-select>
+
+    <!-- Min % -->
+    <p-inputNumber
+      [(ngModel)]="minPct"
+      name="minPct"
+      placeholder="Enter Percent"
+      [min]="0"
+      [max]="100"
+      [showButtons]="true"
+      [step]="5"
+    ></p-inputNumber>
+
+    <!-- Only Unmarked -->
+    <div class="flex items-center gap-2">
+      <label class="text-sm text-gray-600">Unmarked</label>
+      <p-toggle-switch
+        [(ngModel)]="onlyUnmarked"
+        name="onlyUnmarked"
+      ></p-toggle-switch>
+    </div>
+
+    <!-- Actions -->
+    <p-button
+      label="Apply"
+      icon="pi pi-filter"
+      class="p-button-sm"
+      (onClick)="fetch()"
+    ></p-button>
+    <p-button
+      label="Export"
+      icon="pi pi-download"
+      severity="secondary"
+      [text]="true"
+      class="p-button-sm"
+    ></p-button>
+  </div>
+</p-toolbar>
+
+<!-- MAIN LAYOUT -->
+<div class="flex gap-2 h-[calc(100vh-22rem)]">
+  <!-- LEFT: Table + Chart -->
+  <div class="flex flex-col flex-1 min-w-0 gap-2">
+    <!-- TABLE -->
+    <p-card class="flex-1 shadow-sm rounded-lg border border-gray-100 p-2">
+      <ng-template pTemplate="header">
+        <h2 class="text-lg font-semibold text-gray-700">Class Attendance</h2>
+      </ng-template>
+
+      <ng-template pTemplate="content">
+        <p-table
+          [value]="rows()"
+          [loading]="loading()"
+          dataKey="classroom._id"
+          [rowHover]="true"
+          styleClass="p-datatable-sm"
+          [scrollable]="true"
+          scrollHeight="100%"
+          [paginator]="true"
+          [rows]="6"
+        >
+          <ng-template pTemplate="header">
+            <tr class="bg-gray-50 text-gray-700">
+              <th>Class</th>
+              <th class="text-right">Total</th>
+              <th class="text-right">Present</th>
+              <th class="text-right">Late</th>
+              <th class="text-right">Absent</th>
+              <th class="text-right">Unmarked</th>
+              <th class="text-right">%</th>
+              <th>Status</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-r>
+            <tr
+              class="hover:bg-gray-50 transition"
+              (mouseenter)="showPopover($event, r, donutPopover)"
+              (mouseleave)="hidePopover(donutPopover)"
+            >
+              <td class="font-medium">
+                {{ r.classroom.name
+                }}<ng-container *ngIf="r.classroom.section">
+                  - {{ r.classroom.section }}</ng-container
+                >
+              </td>
+              <td class="text-right">{{ r.total }}</td>
+              <td class="text-right text-green-600">{{ r.present }}</td>
+              <td class="text-right text-amber-600">{{ r.late }}</td>
+              <td class="text-right text-red-600">{{ r.absent }}</td>
+              <td
+                class="text-right"
+                [ngClass]="{ 'text-red-600': r.unmarked > 0 }"
+              >
+                {{ r.unmarked }}
+              </td>
+              <td class="text-right">{{ r.percentage | number : "1.0-2" }}</td>
+              <td>
+                <p-tag
+                  [value]="getStatusLabel(r.percentage, r.unmarked)"
+                  [severity]="getStatusSeverity(r.percentage, r.unmarked)"
+                  styleClass="px-2 py-1 text-xs rounded-full"
+                ></p-tag>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </ng-template>
+    </p-card>
+
+    <!-- STACKED CHART -->
+    <p-card class="flex flex-col p-2">
+      <ng-template pTemplate="header">
+        <h2 class="text-lg font-semibold text-gray-700">Class Comparison</h2>
+      </ng-template>
+
+      <!-- this must grow and provide height to the chart -->
+      <div class="overflow-x-auto">
+        <div class="h-full" [style.minWidth.px]="(rows().length || 0) * 14">
+          <app-class-wise-summary-chart
+            [items]="rows()"
+            height="20rem"
+          ></app-class-wise-summary-chart>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- RIGHT: KPIs -->
+  <div class="flex flex-col gap-2 min-w-[32rem] h-full">
+    <p-card>
+      <p-datepicker
+        [(ngModel)]="date"
+        name="date"
+        [showWeek]="true"
+        [inline]="true"
+        [showIcon]="true"
+        dateFormat="dd M yy"
+        styleClass="w-full h-full"
+      ></p-datepicker>
+    </p-card>
+    <p-card class="shadow-sm rounded-lg border border-gray-100 p-2 h-full">
+      <ng-template pTemplate="header">
+        <h2 class="text-lg font-semibold text-gray-700">Today’s KPIs</h2>
+      </ng-template>
+
+      <ng-template pTemplate="content">
+        <div class="grid grid-cols-2 gap-4 text-center">
+          <div class="p-3 rounded-lg bg-gray-50">
+            <div class="text-sm text-gray-500">Total</div>
+            <div class="text-xl font-bold">{{ kpi.total }}</div>
+          </div>
+          <div class="p-3 rounded-lg bg-green-50">
+            <div class="text-sm text-gray-500">Present</div>
+            <div class="text-xl font-bold text-green-600">
+              {{ kpi.present }}
+            </div>
+          </div>
+          <div class="p-3 rounded-lg bg-amber-50">
+            <div class="text-sm text-gray-500">Late</div>
+            <div class="text-xl font-bold text-amber-600">{{ kpi.late }}</div>
+          </div>
+          <div class="p-3 rounded-lg bg-red-50">
+            <div class="text-sm text-gray-500">Absent</div>
+            <div class="text-xl font-bold text-red-600">{{ kpi.absent }}</div>
+          </div>
+          <div class="p-3 rounded-lg bg-gray-50">
+            <div class="text-sm text-gray-500">Unmarked</div>
+            <div
+              class="text-xl font-bold"
+              [ngClass]="{ 'text-red-600': kpi.unmarked > 0 }"
+            >
+              {{ kpi.unmarked }}
+            </div>
+          </div>
+          <div class="p-3 rounded-lg bg-blue-50">
+            <div class="text-sm text-gray-500">Avg %</div>
+            <div class="text-xl font-bold text-blue-600">
+              {{ kpi.avgPct | number : "1.0-2" }}%
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 space-y-3 w-f">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600">Best Class:</span>
+            <p-tag
+              *ngIf="kpi.best"
+              [value]="
+                kpi.best.label + ' • ' + (kpi.best.pct | number : '1.0-2') + '%'
+              "
+              severity="success"
+            ></p-tag>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-600">Needs Attention:</span>
+            <p-tag
+              *ngIf="kpi.worst"
+              [value]="
+                kpi.worst.label +
+                ' • ' +
+                (kpi.worst.pct | number : '1.0-2') +
+                '%'
+              "
+              severity="danger"
+            ></p-tag>
+          </div>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+</div>
+
+<p-popover #donutPopover>
+  <ng-template #content>
+    <p-chart
+      type="doughnut"
+      [data]="data"
+      [options]="options"
+      style="width: 300px; height: 300px"
+    ></p-chart>
+  </ng-template>
+</p-popover>

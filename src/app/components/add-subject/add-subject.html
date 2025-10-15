@@ -1,0 +1,110 @@
+<p-toast></p-toast>
+
+<div styleClass="w-full mx-auto p-4">
+  <ng-template pTemplate="header">
+    <div
+      class="flex justify-between items-center px-6 py-3 border-b border-gray-300 mb-4"
+    >
+      <span class="font-semibold text-2xl">Create Subject</span>
+    </div>
+  </ng-template>
+
+  <form [formGroup]="subjectForm" class="grid grid-cols-1 md:grid-cols-1 gap-4">
+    <!-- Class Name -->
+
+    <div>
+      <label class="block text-xs mb-1"
+        >Class Name <span class="text-red-500">*</span></label
+      >
+      <p-select
+        formControlName="classroom"
+        [appendTo]="'body'"
+        [filter]="true"
+        name="classroom"
+        [options]="classNames"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select Class"
+        class="w-full"
+      ></p-select>
+    </div>
+    <div>
+      <label class="block text-xs mb-1"
+        >Subject Name<span class="text-red-500">*</span></label
+      >
+      <input
+        pInputText
+        id="name"
+        type="text"
+        formControlName="name"
+        name="name"
+        autocomplete="off"
+        class="w-full"
+      />
+    </div>
+
+    <!-- Section -->
+    <div>
+      <label class="block text-xs mb-1">Subject Code</label>
+      <input
+        pInputText
+        id="code"
+        type="text"
+        formControlName="code"
+        name="code"
+        autocomplete="off"
+        class="w-full"
+      />
+    </div>
+    <!-- Academic Year -->
+    <div>
+      <label class="block text-xs mb-1"
+        >Academic Year <span class="text-red-500">*</span></label
+      >
+      <p-select
+        formControlName="academicYear"
+        [options]="academicYears"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select Year"
+        [appendTo]="'body'"
+        class="w-full"
+      ></p-select>
+    </div>
+
+    <!-- Class Teacher -->
+    <div>
+      <label class="block text-xs mb-1"
+        >Subject Teacher <span class="text-red-500">*</span></label
+      >
+      <p-select
+        formControlName="teacher"
+        [options]="teacherNames"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        placeholder="Select Teacher"
+        [appendTo]="'body'"
+        class="w-full"
+      ></p-select>
+    </div>
+    <!-- Actions -->
+    <div class="flex justify-end gap-3 mt-6">
+      <button
+        pButton
+        label="Reset"
+        class="p-button-secondary"
+        (click)="resetForm()"
+      ></button>
+
+      <button
+        pButton
+        [label]="isEditMode ? 'Edit Subject' : 'Add Subject'"
+        icon="pi pi-check"
+        (click)="submitClass()"
+        [disabled]="subjectForm.invalid || loading"
+        [loading]="loading"
+      ></button>
+    </div>
+  </form>
+</div>

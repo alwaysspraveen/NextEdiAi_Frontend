@@ -1,0 +1,124 @@
+<div class="flex flex-col h-[calc(100vh-6rem)]">
+  <p-table
+    #dt2
+    [value]="users"
+    [scrollable]="true"
+    scrollHeight="flex"
+    dataKey="_id"
+    [rows]="10"
+    [paginator]="true"
+    class="flex-1 text-sm"
+    [tableStyle]="{ 'min-width': '65rem' }"
+    [rowsPerPageOptions]="[10, 25, 50]"
+  [globalFilterFields]="['name', 'email', 'subjectList']"
+  [tableStyle]="{ 'min-width': '65rem' }"
+>
+  <!-- Caption / Global Search -->
+  <ng-template pTemplate="caption">
+    <div class="flex items-center justify-between gap-3">
+      <p class="text-xl font-semibold text-gray-800">Manage Teachers</p>
+      <div class="flex items-center gap-3">
+        <p-button
+          label="Add New Teacher"
+          icon="pi pi-plus"
+          (onClick)="showTeacherForm = true; isEditMode = false; editing = null"
+        />
+        <p-iconfield iconPosition="left" class="ml-auto">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+          <input
+            pInputText
+            type="text"
+            placeholder="Search by grade, year or teacher"
+            (input)="dt2.filterGlobal($event.target.value, 'contains')"
+          />
+        </p-iconfield>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Column Headers -->
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Subjects</th>
+      <th>Created</th>
+      <th>Action</th>
+    </tr>
+  </ng-template>
+
+  <!-- Body -->
+  <ng-template pTemplate="body" let-teacher>
+    <tr
+      [pSelectableRow]="teacher"
+      [attr.data-id]="teacher._id"
+      [attr.data-email]="teacher.email"
+    >
+      <td>{{ teacher.name || teacher.fname }}</td>
+      <td class="truncate">{{ teacher.email }}</td>
+      <td>
+        <ng-container *ngIf="teacher.teacherSubjects?.length; else noSubs">
+          <div class="flex flex-wrap gap-1">
+            <p-tag
+              *ngFor="let sub of teacher.teacherSubjects"
+              [value]="sub"
+              severity="info"
+              styleClass="text-xs"
+            />
+          </div>
+        </ng-container>
+        <ng-template #noSubs>
+          <span class="text-gray-400">—</span>
+        </ng-template>
+      </td>
+      <td>{{ teacher.createdAt | date : "mediumDate" }}</td>
+      <td>
+        <div class="flex gap-2">
+          <button
+            pButton
+            type="button"
+            icon="pi pi-pencil"
+            class="p-button-sm p-button-info"
+            pTooltip="Edit Teacher"
+            tooltipPosition="top"
+            (click)="editTeacher(teacher)"
+          ></button>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-trash"
+            class="p-button-sm p-button-danger"
+            pTooltip="Delete Teacher"
+            tooltipPosition="top"
+          ></button>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+
+  <!-- Empty -->
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="5">No teachers found.</td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p-dialog
+  header="{{ editing ? 'Edit Teacher' : 'Add New Teacher' }}"
+  [(visible)]="showTeacherForm"
+  [modal]="true"
+  [dismissableMask]="false"
+  [closeOnEscape]="false"
+  [blockScroll]="true"
+  styleClass="w-fit h-[90vh] max-h-screen mx-auto p-2 overflow-auto"
+>
+  <app-add-teacher
+    (close)="showTeacherForm = false"
+    [teacher]="editing"
+    [isEditMode]="isEditMode"
+    (saved)="loadUsers()"
+  ></app-add-teacher>
+</p-dialog>

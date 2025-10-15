@@ -1,0 +1,56 @@
+<div class="flex justify-start gap-2 h-screen overflow-hidden">
+  <div
+    class="h-screen flex flex-col items-center justify-between w-[16rem]"
+  >
+    <div class="bg-white w-full p-4 border-b-1 border-gray-200 rounded-t-md">
+      School
+    </div>
+    <div class="flex-1 overflow-y-auto h-full flex flex-col w-full bg-white">
+      <p-menu
+        [model]="items"
+        [routerLink]=""
+        class="flex border-none"
+        styleClass="w-full md:w-60 text-sm custom-menu"
+      >
+        <ng-template pTemplate="submenuheader" let-item>
+          <span class="text-primary font-semibold text-blue-500">{{
+            item.label
+          }}</span>
+        </ng-template>
+        <ng-template pTemplate="item" let-item>
+          <a
+            pRipple
+            class="flex items-center p-menu-item-link"
+            [routerLink]="item.routerLink"
+          >
+            <span [class]="item.icon"></span>
+            <span class="ml-2 font-medium">{{ item.label }}</span>
+            <p-badge *ngIf="item.badge" class="ml-auto" [value]="item.badge" />
+            <span
+              *ngIf="item.shortcut"
+              class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1"
+            >
+              {{ item.shortcut }}
+            </span>
+          </a>
+        </ng-template>
+      </p-menu>
+    </div>
+    <div
+      class="bg-white flex justify-center items-center w-full p-2 border-t-1 border-gray-200 rounded-b-md"
+    >
+       <p-button
+        label="Logout"
+        severity="danger"
+        variant="text"
+        styleClass="!w-56"
+        icon="pi pi-sign-out"
+        (onClick)="authService.logout()"
+      />
+    </div>
+  </div>
+  <div class="flex flex-col w-full gap-1 bg-gray-100 min-h-screen">
+    <app-header></app-header>
+    <router-outlet></router-outlet>
+  </div>
+</div>
